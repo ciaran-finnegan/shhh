@@ -1,0 +1,23 @@
+name = "shhh"
+main = "src/worker/index.ts"
+compatibility_date = "2025-02-14"
+compatibility_flags = ["nodejs_compat"]
+account_id = "8d2b0d67bfcd46cf2e40eed93b716660"
+
+[assets]
+directory = "./dist/client"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[observability]
+enabled = true
+
+[[kv_namespaces]]
+binding = "SECRETS"
+id = "f3cb3cbbf68d4411a2255634c2898b35"
+preview_id = "bafb948fcb6e403ebaf5ad264828f50f"
+
+[[kv_namespaces]]
+binding = "RATE_LIMITS"
+id = "5606971e4e564174b62da744893bf041"
+preview_id = "2a1b6fbbaec740d589f5e0d74dc1b949"
