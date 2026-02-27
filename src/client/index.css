@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-paper: #E8E4DD;
-  --color-signal-red: #E63B2E;
-  --color-off-white: #F5F3EE;
+  --color-paper: #e8e4dd;
+  --color-signal-red: #e63b2e;
+  --color-off-white: #f5f3ee;
   --color-black: #111111;
   --color-mid-gray: #888880;
 
@@ -37,9 +37,23 @@ body::before {
 
 /* Shake animation for wrong passphrase */
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-  20%, 40%, 60%, 80% { transform: translateX(4px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 .animate-shake {

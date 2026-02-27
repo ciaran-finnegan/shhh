@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import ShareView from "../../../src/client/components/ShareView";
 
 describe("ShareView", () => {
@@ -27,9 +27,7 @@ describe("ShareView", () => {
 
   it("shows one-time warning", () => {
     render(<ShareView {...defaultProps} />);
-    expect(
-      screen.getByText(/can only be opened once/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/can only be opened once/)).toBeInTheDocument();
   });
 
   it("has copy buttons", () => {

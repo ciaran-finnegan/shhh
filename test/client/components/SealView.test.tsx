@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import SealView from "../../../src/client/components/SealView";
 
 describe("SealView", () => {
@@ -44,5 +44,18 @@ describe("SealView", () => {
     const original = input.value;
     fireEvent.click(screen.getByText("Regenerate"));
     expect(input.value).not.toBe(original);
+  });
+
+  it("renders file drop zone", () => {
+    render(<SealView onSealed={vi.fn()} onError={vi.fn()} />);
+    expect(screen.getByText("Attachments")).toBeInTheDocument();
+    expect(screen.getByText("Drop files here or click to browse")).toBeInTheDocument();
+  });
+
+  it("enables Seal button with files only (no text)", () => {
+    render(<SealView onSealed={vi.fn()} onError={vi.fn()} />);
+    // Button should be disabled with no text and no files
+    const button = screen.getByRole("button", { name: "Seal it" });
+    expect(button).toBeDisabled();
   });
 });

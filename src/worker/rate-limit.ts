@@ -1,9 +1,5 @@
-import {
-  RATE_LIMIT_WINDOW,
-  RATE_LIMIT_CREATE,
-  RATE_LIMIT_RETRIEVE,
-} from "@shared/constants";
-import { Env } from "./types";
+import { RATE_LIMIT_CREATE, RATE_LIMIT_RETRIEVE, RATE_LIMIT_WINDOW } from "@shared/constants";
+import type { Env } from "./types";
 
 const LIMITS: Record<string, number> = {
   create: RATE_LIMIT_CREATE,
@@ -19,11 +15,7 @@ async function hashIP(ip: string): Promise<string> {
     .join("");
 }
 
-export async function checkRateLimit(
-  env: Env,
-  ip: string,
-  action: string,
-): Promise<boolean> {
+export async function checkRateLimit(env: Env, ip: string, action: string): Promise<boolean> {
   const limit = LIMITS[action];
   if (!limit) return true;
 
