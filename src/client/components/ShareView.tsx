@@ -9,12 +9,7 @@ interface ShareViewProps {
   onReset: () => void;
 }
 
-export default function ShareView({
-  id,
-  passphrase,
-  expiresIn,
-  onReset,
-}: ShareViewProps) {
+export default function ShareView({ id, passphrase, expiresIn, onReset }: ShareViewProps) {
   const shareUrl = useMemo(() => {
     const origin = window.location.origin;
     return `${origin}/s/${id}`;
@@ -39,25 +34,21 @@ export default function ShareView({
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-mid-gray mb-2 uppercase tracking-wider">
+          <span className="block text-sm font-semibold text-mid-gray mb-2 uppercase tracking-wider">
             Link
-          </label>
+          </span>
           <div className="flex items-center gap-2 bg-off-white rounded-[var(--radius-inner)] p-3">
-            <code className="flex-1 font-mono text-sm truncate select-all">
-              {shareUrl}
-            </code>
+            <code className="flex-1 font-mono text-sm truncate select-all">{shareUrl}</code>
             <CopyButton text={shareUrl} label="Copy" />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-mid-gray mb-2 uppercase tracking-wider">
+          <span className="block text-sm font-semibold text-mid-gray mb-2 uppercase tracking-wider">
             Passphrase
-          </label>
+          </span>
           <div className="flex items-center gap-2 bg-off-white rounded-[var(--radius-inner)] p-3">
-            <code className="flex-1 font-mono text-sm select-all">
-              {passphrase}
-            </code>
+            <code className="flex-1 font-mono text-sm select-all">{passphrase}</code>
             <CopyButton text={passphrase} label="Copy" />
           </div>
         </div>

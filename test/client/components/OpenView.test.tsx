@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import OpenView from "../../../src/client/components/OpenView";
 
 describe("OpenView", () => {
@@ -11,16 +11,12 @@ describe("OpenView", () => {
 
   it("renders passphrase input", () => {
     render(<OpenView {...defaultProps} />);
-    expect(
-      screen.getByPlaceholderText("Enter the passphrase..."),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Enter the passphrase...")).toBeInTheDocument();
   });
 
   it("shows the intro message", () => {
     render(<OpenView {...defaultProps} />);
-    expect(
-      screen.getByText("Someone sent you a secret."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Someone sent you a secret.")).toBeInTheDocument();
   });
 
   it("disables Open button when passphrase is empty", () => {
@@ -31,11 +27,17 @@ describe("OpenView", () => {
 
   it("enables Open button when passphrase has content", () => {
     render(<OpenView {...defaultProps} />);
-    fireEvent.change(
-      screen.getByPlaceholderText("Enter the passphrase..."),
-      { target: { value: "some-passphrase" } },
-    );
+    fireEvent.change(screen.getByPlaceholderText("Enter the passphrase..."), {
+      target: { value: "some-passphrase" },
+    });
     const button = screen.getByRole("button", { name: "Open it" });
     expect(button).not.toBeDisabled();
+  });
+
+  it("shows one-shot warning message", () => {
+    render(<OpenView {...defaultProps} />);
+    expect(
+      screen.getByText("Enter the passphrase to open it. You only get one shot."),
+    ).toBeInTheDocument();
   });
 });

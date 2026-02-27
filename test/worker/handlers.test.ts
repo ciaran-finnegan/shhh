@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { handleCreate, handleRetrieve } from "../../src/worker/handlers";
 import type { Env } from "../../src/worker/types";
 
@@ -25,14 +25,11 @@ function createEnv(): Env {
     SECRETS: createMockKV(),
     RATE_LIMITS: createMockKV(),
     ASSETS: {} as Fetcher,
+    FILES: {} as R2Bucket,
   };
 }
 
-function makeRequest(
-  method: string,
-  body?: unknown,
-  ip = "127.0.0.1",
-): Request {
+function makeRequest(method: string, body?: unknown, ip = "127.0.0.1"): Request {
   const init: RequestInit = {
     method,
     headers: {

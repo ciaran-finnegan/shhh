@@ -1,13 +1,8 @@
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type ZxcvbnFn = (password: string) => { score: number };
 
-const SEGMENT_COLORS = [
-  "bg-signal-red",
-  "bg-orange-400",
-  "bg-yellow-400",
-  "bg-green-500",
-];
+const SEGMENT_COLORS = ["bg-signal-red", "bg-orange-400", "bg-yellow-400", "bg-green-500"];
 
 const LABELS = ["Weak", "Fair", "Good", "Strong"];
 
@@ -41,6 +36,7 @@ export default function StrengthBar({ passphrase }: StrengthBarProps) {
     }
   }, [ready]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: ready signals zxcvbnFn availability at module level
   const score = useMemo(() => {
     if (!passphrase || !zxcvbnFn) return 0;
     return zxcvbnFn(passphrase).score;
@@ -61,9 +57,7 @@ export default function StrengthBar({ passphrase }: StrengthBarProps) {
         ))}
       </div>
       {passphrase && filled > 0 && (
-        <span className="text-xs font-mono text-mid-gray">
-          {LABELS[filled - 1]}
-        </span>
+        <span className="text-xs font-mono text-mid-gray">{LABELS[filled - 1]}</span>
       )}
     </div>
   );

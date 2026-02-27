@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { encrypt, decrypt } from "../../src/client/lib/crypto";
+import { beforeEach, describe, expect, it } from "vitest";
+import { decrypt, encrypt } from "../../src/client/lib/crypto";
 import { generatePassphrase } from "../../src/client/lib/passphrase";
 
 /**

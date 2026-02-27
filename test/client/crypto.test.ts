@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { encrypt, decrypt, generateId } from "../../src/client/lib/crypto";
-import { SALT_BYTES, IV_BYTES } from "../../src/shared/constants";
+import { describe, expect, it } from "vitest";
+import { decrypt, encrypt, generateId } from "../../src/client/lib/crypto";
+import { IV_BYTES, SALT_BYTES } from "../../src/shared/constants";
 
 function fromBase64Url(str: string): Uint8Array {
   const padded = str.replace(/-/g, "+").replace(/_/g, "/");
@@ -66,9 +66,7 @@ describe("encrypt / decrypt", () => {
 describe("generateId", () => {
   it("returns a valid UUID v4", () => {
     const id = generateId();
-    expect(id).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
-    );
+    expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
   });
 
   it("generates unique IDs", () => {

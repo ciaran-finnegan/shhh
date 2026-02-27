@@ -1,8 +1,10 @@
-import { useState, useCallback } from "react";
 import { TTL_PRESETS } from "@shared/constants";
+import { useCallback, useState } from "react";
+import { createSecret, createSecretWithFiles } from "../lib/api";
 import { encrypt } from "../lib/crypto";
+import { encryptFile } from "../lib/file-crypto";
 import { generatePassphrase } from "../lib/passphrase";
-import { createSecret } from "../lib/api";
+import FileDropZone from "./FileDropZone";
 import MagneticButton from "./MagneticButton";
 import StrengthBar from "./StrengthBar";
 
@@ -16,25 +18,45 @@ export default function SealView({ onSealed, onError }: SealViewProps) {
   const [passphrase, setPassphrase] = useState(() => generatePassphrase());
   const [ttl, setTtl] = useState<number>(TTL_PRESETS[0].seconds);
   const [sealing, setSealing] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
+  const [sealProgress, setSealProgress] = useState("");
 
   const regenerate = useCallback(() => {
     setPassphrase(generatePassphrase());
   }, []);
 
   const handleSeal = useCallback(async () => {
-    if (!secret.trim()) return;
+    const hasText = secret.trim().length > 0;
+    const hasFiles = files.length > 0;
+    if (!hasText && !hasFiles) return;
 
     setSealing(true);
     try {
-      const ciphertext = await encrypt(secret, passphrase);
-      const result = await createSecret(ciphertext, ttl);
-      onSealed(result.id, passphrase, result.expiresIn);
+      if (hasFiles) {
+        setSealProgress("Encrypting...");
+        const encryptedText = hasText ? await encrypt(secret, passphrase) : null;
+
+        const encryptedFiles = [];
+        for (let i = 0; i < files.length; i++) {
+          setSealProgress(`Encrypting file ${i + 1}/${files.length}...`);
+          encryptedFiles.push(await encryptFile(files[i], passphrase));
+        }
+
+        setSealProgress("Uploading...");
+        const result = await createSecretWithFiles(encryptedText, encryptedFiles, ttl);
+        onSealed(result.id, passphrase, result.expiresIn);
+      } else {
+        const ciphertext = await encrypt(secret, passphrase);
+        const result = await createSecret(ciphertext, ttl);
+        onSealed(result.id, passphrase, result.expiresIn);
+      }
     } catch (err) {
       onError(err instanceof Error ? err.message : "Failed to seal secret");
     } finally {
       setSealing(false);
+      setSealProgress("");
     }
-  }, [secret, passphrase, ttl, onSealed, onError]);
+  }, [secret, passphrase, ttl, files, onSealed, onError]);
 
   return (
     <div className="animate-fade-up space-y-6">
@@ -55,6 +77,8 @@ export default function SealView({ onSealed, onError }: SealViewProps) {
         />
       </div>
 
+      <FileDropZone files={files} onFilesChange={setFiles} />
+
       <div>
         <div className="flex items-center justify-between mb-2">
           <label
@@ -64,6 +88,7 @@ export default function SealView({ onSealed, onError }: SealViewProps) {
             Passphrase
           </label>
           <button
+            type="button"
             onClick={regenerate}
             className="text-xs font-mono text-signal-red hover:underline cursor-pointer"
           >
@@ -83,12 +108,13 @@ export default function SealView({ onSealed, onError }: SealViewProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-mid-gray mb-3 uppercase tracking-wider">
+        <span className="block text-sm font-semibold text-mid-gray mb-3 uppercase tracking-wider">
           Expires in
-        </label>
+        </span>
         <div className="flex gap-2">
           {TTL_PRESETS.map((preset) => (
             <button
+              type="button"
               key={preset.seconds}
               onClick={() => setTtl(preset.seconds)}
               className={`flex-1 py-2.5 rounded-[var(--radius-inner)] text-sm font-semibold transition-all cursor-pointer ${
@@ -105,10 +131,10 @@ export default function SealView({ onSealed, onError }: SealViewProps) {
 
       <MagneticButton
         onClick={handleSeal}
-        disabled={!secret.trim() || sealing}
+        disabled={(!secret.trim() && files.length === 0) || sealing}
         className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {sealing ? "Sealing..." : "Seal it"}
+        {sealing ? sealProgress || "Sealing..." : "Seal it"}
       </MagneticButton>
     </div>
   );

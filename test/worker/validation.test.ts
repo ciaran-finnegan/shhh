@@ -1,10 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+import { MAX_CIPHERTEXT_BYTES, MAX_FILES, TTL_MAX, TTL_MIN } from "../../src/shared/constants";
 import {
-  validateCreateBody,
-  validateUUID,
   ValidationError,
+  validateCreateBody,
+  validateCreateManifest,
+  validateUUID,
 } from "../../src/worker/validation";
-import { MAX_CIPHERTEXT_BYTES, TTL_MIN, TTL_MAX } from "../../src/shared/constants";
 
 describe("validateCreateBody", () => {
   it("accepts valid body", () => {
@@ -33,21 +34,21 @@ describe("validateCreateBody", () => {
   });
 
   it("rejects non-integer ttl", () => {
-    expect(() =>
-      validateCreateBody({ ciphertext: "data", ttl: 3600.5 }),
-    ).toThrow("ttl must be an integer");
+    expect(() => validateCreateBody({ ciphertext: "data", ttl: 3600.5 })).toThrow(
+      "ttl must be an integer",
+    );
   });
 
   it("rejects ttl below minimum", () => {
-    expect(() =>
-      validateCreateBody({ ciphertext: "data", ttl: TTL_MIN - 1 }),
-    ).toThrow(`ttl must be between ${TTL_MIN} and ${TTL_MAX}`);
+    expect(() => validateCreateBody({ ciphertext: "data", ttl: TTL_MIN - 1 })).toThrow(
+      `ttl must be between ${TTL_MIN} and ${TTL_MAX}`,
+    );
   });
 
   it("rejects ttl above maximum", () => {
-    expect(() =>
-      validateCreateBody({ ciphertext: "data", ttl: TTL_MAX + 1 }),
-    ).toThrow(`ttl must be between ${TTL_MIN} and ${TTL_MAX}`);
+    expect(() => validateCreateBody({ ciphertext: "data", ttl: TTL_MAX + 1 })).toThrow(
+      `ttl must be between ${TTL_MIN} and ${TTL_MAX}`,
+    );
   });
 
   it("accepts boundary TTL values", () => {
@@ -56,9 +57,87 @@ describe("validateCreateBody", () => {
   });
 
   it("rejects unexpected fields", () => {
+    expect(() => validateCreateBody({ ciphertext: "data", ttl: 3600, hack: true })).toThrow(
+      "Unexpected field: hack",
+    );
+  });
+});
+
+describe("validateCreateManifest", () => {
+  it("accepts valid manifest with text only", () => {
+    const result = validateCreateManifest({ ttl: 3600, text: "encrypted" });
+    expect(result.ttl).toBe(3600);
+    expect(result.text).toBe("encrypted");
+  });
+
+  it("accepts valid manifest with files only", () => {
+    const result = validateCreateManifest({
+      ttl: 3600,
+      files: [{ encryptedMeta: "meta", storage: "kv", data: "filedata" }],
+    });
+    expect(result.files).toHaveLength(1);
+  });
+
+  it("accepts manifest with text and files", () => {
+    const result = validateCreateManifest({
+      ttl: 3600,
+      text: "text",
+      files: [{ encryptedMeta: "meta", storage: "r2" }],
+    });
+    expect(result.text).toBe("text");
+    expect(result.files).toHaveLength(1);
+  });
+
+  it("rejects manifest with neither text nor files", () => {
+    expect(() => validateCreateManifest({ ttl: 3600 })).toThrow("At least text or files required");
+  });
+
+  it("rejects invalid TTL", () => {
+    expect(() => validateCreateManifest({ ttl: 10, text: "x" })).toThrow("ttl must be between");
+  });
+
+  it("rejects too many files", () => {
+    const files = Array.from({ length: MAX_FILES + 1 }, (_, i) => ({
+      encryptedMeta: `meta-${i}`,
+      storage: "kv" as const,
+      data: "d",
+    }));
+    expect(() => validateCreateManifest({ ttl: 3600, files })).toThrow(
+      `Maximum ${MAX_FILES} files`,
+    );
+  });
+
+  it("rejects KV file without data", () => {
     expect(() =>
-      validateCreateBody({ ciphertext: "data", ttl: 3600, hack: true }),
-    ).toThrow("Unexpected field: hack");
+      validateCreateManifest({
+        ttl: 3600,
+        files: [{ encryptedMeta: "meta", storage: "kv" }],
+      }),
+    ).toThrow("data is required for KV");
+  });
+
+  it("rejects file with invalid storage type", () => {
+    expect(() =>
+      validateCreateManifest({
+        ttl: 3600,
+        files: [{ encryptedMeta: "meta", storage: "s3" }],
+      }),
+    ).toThrow('storage must be "kv" or "r2"');
+  });
+
+  it("rejects file with empty encryptedMeta", () => {
+    expect(() =>
+      validateCreateManifest({
+        ttl: 3600,
+        files: [{ encryptedMeta: "", storage: "kv", data: "d" }],
+      }),
+    ).toThrow("encryptedMeta is required");
+  });
+
+  it("rejects unexpected fields", () => {
+    expect(() => validateCreateManifest({ ttl: 3600, text: "x", hack: true })).toThrow(
+      "Unexpected field: hack",
+    );
   });
 });
 

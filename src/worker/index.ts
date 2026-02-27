@@ -1,6 +1,6 @@
-import { Env } from "./types";
 import { handleCreate, handleRetrieve } from "./handlers";
 import { applySecurityHeaders } from "./headers";
+import type { Env } from "./types";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -9,10 +9,7 @@ export default {
 
     if (url.pathname === "/api/secrets" && request.method === "POST") {
       response = await handleCreate(request, env);
-    } else if (
-      url.pathname.startsWith("/api/secrets/") &&
-      request.method === "GET"
-    ) {
+    } else if (url.pathname.startsWith("/api/secrets/") && request.method === "GET") {
       const id = url.pathname.slice("/api/secrets/".length);
       response = await handleRetrieve(request, env, id);
     } else if (url.pathname.startsWith("/api/")) {

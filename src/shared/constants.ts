@@ -14,6 +14,13 @@ export const RATE_LIMIT_WINDOW = 3_600; // 1 hour
 export const RATE_LIMIT_CREATE = 30;
 export const RATE_LIMIT_RETRIEVE = 60;
 
+export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB per file
+export const MAX_FILES = 5;
+export const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100 MB total
+export const KV_INLINE_THRESHOLD = 1 * 1024 * 1024; // 1 MB — files <=1MB go in KV
+
+export const GITHUB_URL = "https://github.com/ciaran-finnegan/shhh";
+
 export const PBKDF2_ITERATIONS = 600_000;
 export const SALT_BYTES = 16;
 export const IV_BYTES = 12;

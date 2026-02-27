@@ -5,7 +5,8 @@ compatibility_flags = ["nodejs_compat"]
 account_id = "6a9e4591f2bb3711c87592659eeee480"
 
 routes = [
-  { pattern = "shhh.riskscope-consulting.com/*", zone_name = "riskscope-consulting.com" }
+  { pattern = "shhh.riskscope-consulting.com/*", zone_name = "riskscope-consulting.com" },
+  { pattern = "share.riskscope-consulting.com/*", zone_name = "riskscope-consulting.com" }
 ]
 
 [assets]
@@ -25,3 +26,8 @@ preview_id = "0985267727ff4f8d890fdfefae7fc04b"
 binding = "RATE_LIMITS"
 id = "53817d6363644972af3652d9b30fa880"
 preview_id = "68ad8115e6054656b31022d31e1fe2d2"
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "shhh-files"
+preview_bucket_name = "shhh-files-preview"
