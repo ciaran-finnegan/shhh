@@ -5,6 +5,13 @@ import type { Env } from "./types";
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    // Redirect HTTP to HTTPS (crypto.subtle requires a secure context)
+    if (url.protocol === "http:") {
+      url.protocol = "https:";
+      return Response.redirect(url.toString(), 301);
+    }
+
     let response: Response;
 
     if (url.pathname === "/api/secrets" && request.method === "POST") {
